@@ -1,4 +1,5 @@
 import pygame
+import math
 
 map = [1, 1, 1, 1, 1, 1, 1, 1,
        1, 0, 0, 0, 1, 0, 0, 1,
@@ -43,38 +44,53 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(x, y))
         self.mask = pygame.mask.from_surface(self.image)
 
+        self.angle = 0
+
     def player_input(self):
         keys = pygame.key.get_pressed()
-        old_x, old_y = self.rect.x, self.rect.y # On mémorise la position avant de bouger
-        if keys[pygame.K_LEFT]:
-            self.rect.x -= 5
+
+        # 1. Rotation
+        if keys[pygame.K_q] or keys[pygame.K_LEFT]: self.angle -= 5
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]: self.angle += 5
+
+        # 2. Calcul du vecteur de mouvement (vitesse de 5 pixels)
+        angle_rad = math.radians(self.angle)
+        dx = math.cos(angle_rad) * 5
+        dy = math.sin(angle_rad) * 5
+
+        # 3. Avancer (Z ou UP)
+        if keys[pygame.K_z] or keys[pygame.K_UP]:
+            # On gère X
+            self.rect.x += dx
             if pygame.sprite.spritecollide(self, world.walls, False, pygame.sprite.collide_mask):
-                self.rect.x += 5 # Annule juste le mouvement X
-
-        # Mouvement Vertical
-        if keys[pygame.K_RIGHT]:
-            self.rect.x += 5
+                self.rect.x -= dx
+            # On gère Y
+            self.rect.y += dy
             if pygame.sprite.spritecollide(self, world.walls, False, pygame.sprite.collide_mask):
-                self.rect.x -= 5
+                self.rect.y -= dy
 
-
-        # --- MOUVEMENT VERTICAL (Y) ---
-        if keys[pygame.K_UP]:
-            self.rect.y -= 5
-            # Si on touche un mur en haut, on annule le mouvement Y
+        # 4. Reculer
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            # On gère X (on fait l'inverse : - dx)
+            self.rect.x -= dx
             if pygame.sprite.spritecollide(self, world.walls, False, pygame.sprite.collide_mask):
-                self.rect.y += 5
-
-        if keys[pygame.K_DOWN]:
-            self.rect.y += 5
-            # Si on touche un mur en bas, on annule le mouvement Y
+                self.rect.x += dx
+            # On gère Y
+            self.rect.y -= dy
             if pygame.sprite.spritecollide(self, world.walls, False, pygame.sprite.collide_mask):
-                self.rect.y -= 5
+                self.rect.y += dy
 
-        # Si après avoir bougé on touche un mur, on revient en arrière
-        if pygame.sprite.spritecollide(self, world.walls, False, pygame.sprite.collide_mask):
-            print("ouais")
-            self.rect.x, self.rect.y = old_x, old_y
+    def draw_direction(self, surface):
+        angle_rad = math.radians(self.angle)
+        line_x = self.rect.centerx + math.cos(angle_rad) * 50
+        line_y = self.rect.centery + math.sin(angle_rad) * 50
+
+        # On dessine sur la surface passée en argument (le screen)
+        pygame.draw.line(surface, (0, 255, 0), self.rect.center, (line_x, line_y), 3)
+
+
+
+
 
     def update(self):
         self.player_input()
@@ -146,10 +162,9 @@ while True:
 
     world.all_sprites.draw(screen)
 
+    # Pour afficher la ligne de direction
+    j1.draw_direction(screen)
 
-    pygame.display.update()
-    # collision_sprite()
-    clock.tick(60)
 
 
     pygame.display.update()
