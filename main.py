@@ -102,6 +102,12 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.line(surface, (0, 255, 0), self.rect.center, (line_x, line_y), 3)
 
     def cast_rays(self, surface):
+        # --- ETAPE A : LE DECOR ---
+        # Un rectangle gris pour le ciel sur toute la zone 3D (de 800 à 1400)
+        pygame.draw.rect(surface, (50, 50, 50), [800, 0, 600, 400])
+        # Un rectangle vert ou gris clair pour le sol
+        pygame.draw.rect(surface, (100, 100, 100), [800, 400, 600, 400])
+
         # On définit le début du cône (ex: l'angle actuel - 30 degrés)
         start_angle = self.angle - 30
         #
@@ -148,9 +154,16 @@ class Player(pygame.sprite.Sprite):
                         # x_3d : on commence à 800 pixels et on avance de 10 pixels par rayon (60 rayons * 10 = 600px)
                         x_3d = 800 + (i * 10)
 
+
+                        # Shadow
+                        # On définit une intensité qui diminue avec la distance
+                        # On divise 200 par un facteur de la distance (on peut changer selon nos préférences)
+                        # On utilise min/max pour rester entre 0 et 255
+                        color_value = 200 - min(200, depth * 0.3)
+
                         # On dessine un rectangle (la colonne du mur)
                         # On le centre verticalement sur l'écran (400 est le milieu de 800)
-                        pygame.draw.rect(surface, (0, 0, 200), [x_3d, 400 - wall_height//2, 10, wall_height])
+                        pygame.draw.rect(surface, (0, 0, color_value), [x_3d, 400 - wall_height//2, 10, wall_height])
 
 
                         break
