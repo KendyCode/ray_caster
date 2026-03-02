@@ -101,35 +101,46 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.line(surface, (0, 255, 0), self.rect.center, (line_x, line_y), 3)
 
     def cast_rays(self, surface):
-        # On commence au centre du joueur
-        ray_x = self.rect.centerx
-        ray_y = self.rect.centery
+        # On définit le début du cône (ex: l'angle actuel - 30 degrés)
+        start_angle = self.angle - 30
+        #
+        for i in range(60): # On lance 60 rayons
+            current_angle = start_angle + i
 
-        # On prépare les petits pas du rayon
-        angle_rad = math.radians(self.angle)
+            # On commence au centre du joueur
+            ray_x = self.rect.centerx
+            ray_y = self.rect.centery
 
-        # On avance de 1 pixel à chaque fois pour être précis
-        dx = math.cos(angle_rad)
-        dy = math.sin(angle_rad)
+            # On prépare les petits pas du rayon
+            angle_rad = math.radians(current_angle)
 
-        # On fait avancer le rayon (limite à 1000 pixels pour éviter les boucles infinies)
-        for depth in range(1000):
+            # On avance de 1 pixel à chaque fois pour être précis
+            dx = math.cos(angle_rad)
+            dy = math.sin(angle_rad)
 
-            ray_x += dx
-            ray_y += dy
-            # 1. On trouve la case correspondante
-            col = int(ray_x // 100)
-            row = int(ray_y // 100)
-            index = row * 8 + col
+            # On fait avancer le rayon (limite à 1000 pixels pour éviter les boucles infinies)
+            for depth in range(1000):
 
-            # 2. On vérifie qu'on est bien dans les limites de la map
-            if 0 <= col < 8 and 0 <= row < 5: # Largeur 8, Hauteur 5
-                if map[index] == 1: # On utilise la liste 'map' globale
-                    pygame.draw.line(surface, "Red", self.rect.center, (ray_x, ray_y), 2)
+                ray_x += dx
+                ray_y += dy
+                # 1. On trouve la case correspondante
+                col = int(ray_x // 100)
+                row = int(ray_y // 100)
+                index = row * 8 + col
+
+                # 2. On vérifie qu'on est bien dans les limites de la map
+                if 0 <= col < 8 and 0 <= row < 5: # Largeur 8, Hauteur 5
+                    if map[index] == 1: # On utilise la liste 'map' globale
+                        pygame.draw.line(surface, "Red", self.rect.center, (ray_x, ray_y), 1)
+                        break
+                else:
+                    # Si le rayon sort de la map, on arrête de chercher
                     break
-            else:
-                # Si le rayon sort de la map, on arrête de chercher
-                break
+
+
+
+
+
 
 
 
