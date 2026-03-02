@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 map = [1, 1, 1, 1, 1, 1, 1, 1,
        1, 0, 0, 0, 1, 0, 0, 1,
@@ -16,7 +17,7 @@ class Tile(pygame.sprite.Sprite):
         self.image.fill(color)
 
         # Ajout du contour directement sur l'image du sprite
-        pygame.draw.rect(self.image, (0, 0, 0), [0, 0, 100, 100], 1)
+        pygame.draw.rect(self.image, (0, 0, 0), [0, 0, 100, 100],1)
 
         # Le rectangle qui gère la position
         self.rect = self.image.get_rect(topleft=(x, y))
@@ -135,7 +136,9 @@ class Player(pygame.sprite.Sprite):
 
                         # Projection 3D
 
-
+                        # Permet de plus avoir l'effet fish-eye
+                        relative_angle = current_angle - self.angle
+                        depth *= math.cos(math.radians(relative_angle))
 
                         # On calcule la hauteur du mur à afficher
                         # On évite la division par zéro avec max(1, depth)
@@ -183,19 +186,19 @@ class World:
     def generate_world(self):
         x_pos = 0
         y_pos = 0
-        
+
         for i in self.map_data:
             if i == 1:
                 # On crée un obstacle bleu et on l'ajoute au groupe
                 wall = Tile(x_pos, y_pos, (0, 0, 255), is_wall=True)
                 self.walls.add(wall)
                 self.all_sprites.add(wall)
-        
+
             else:
                 floor = Tile(x_pos, y_pos, "Yellow", is_wall=False)
                 self.floors.add(floor)
                 self.all_sprites.add(floor)
-        
+
             x_pos += 100
             if x_pos >= 800:
                 x_pos = 0
