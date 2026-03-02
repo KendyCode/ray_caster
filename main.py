@@ -132,6 +132,24 @@ class Player(pygame.sprite.Sprite):
                 if 0 <= col < 8 and 0 <= row < 5: # Largeur 8, Hauteur 5
                     if map[index] == 1: # On utilise la liste 'map' globale
                         pygame.draw.line(surface, "Red", self.rect.center, (ray_x, ray_y), 1)
+
+                        # Projection 3D
+
+
+
+                        # On calcule la hauteur du mur à afficher
+                        # On évite la division par zéro avec max(1, depth)
+                        wall_height = 20000 / max(1, depth)
+
+                        # On dessine une colonne verticale pour chaque rayon
+                        # x_3d : on commence à 800 pixels et on avance de 10 pixels par rayon (60 rayons * 10 = 600px)
+                        x_3d = 800 + (i * 10)
+
+                        # On dessine un rectangle (la colonne du mur)
+                        # On le centre verticalement sur l'écran (400 est le milieu de 800)
+                        pygame.draw.rect(surface, (0, 0, 200), [x_3d, 400 - wall_height//2, 10, wall_height])
+
+
                         break
                 else:
                     # Si le rayon sort de la map, on arrête de chercher
