@@ -2,11 +2,16 @@ import pygame
 import math
 import random
 
-map = [1, 1, 1, 1, 1, 1, 1, 1,
-       1, 0, 0, 0, 1, 0, 0, 1,
-       1, 0, 1, 0, 0, 1, 0, 1,
-       1, 0, 0, 0, 0, 0, 0, 1,
-       1, 1, 1, 1, 1, 1, 1, 1]
+map = [
+       [1, 1, 1, 1, 1, 1, 1, 1],
+       [1, 0, 0, 0, 1, 0, 0, 1],
+       [1, 0, 1, 0, 0, 1, 0, 1],
+       [1, 0, 0, 0, 0, 0, 0, 1],
+       [1, 1, 1, 1, 1, 1, 1, 1],
+       ]
+
+MAP_HEIGHT = len(map)
+MAP_WIDTH = len(map[0])
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self,x,y,color,is_wall=False):
@@ -133,11 +138,11 @@ class Player(pygame.sprite.Sprite):
                 # 1. On trouve la case correspondante
                 col = int(ray_x // 100)
                 row = int(ray_y // 100)
-                index = row * 8 + col
+
 
                 # 2. On vérifie qu'on est bien dans les limites de la map
-                if 0 <= col < 8 and 0 <= row < 5: # Largeur 8, Hauteur 5
-                    if map[index] == 1: # On utilise la liste 'map' globale
+                if 0 <= col < MAP_WIDTH and 0 <= row < MAP_HEIGHT: # Largeur 8, Hauteur 5
+                    if map[row][col] == 1: # On utilise la liste 'map' globale
                         pygame.draw.line(surface, "Red", self.rect.center, (ray_x, ray_y), 1)
 
                         # Projection 3D
@@ -197,25 +202,21 @@ class World:
         self.generate_world()
 
     def generate_world(self):
-        x_pos = 0
-        y_pos = 0
+        # On parcourt chaque ligne (y)
+        for row_index, row in enumerate(self.map_data):
+            # On parcourt chaque colonne (x) dans cette ligne
+            for col_index, cell in enumerate(row):
+                x_pos = col_index * 100
+                y_pos = row_index * 100
 
-        for i in self.map_data:
-            if i == 1:
-                # On crée un obstacle bleu et on l'ajoute au groupe
-                wall = Tile(x_pos, y_pos, (0, 0, 255), is_wall=True)
-                self.walls.add(wall)
-                self.all_sprites.add(wall)
-
-            else:
-                floor = Tile(x_pos, y_pos, "Yellow", is_wall=False)
-                self.floors.add(floor)
-                self.all_sprites.add(floor)
-
-            x_pos += 100
-            if x_pos >= 800:
-                x_pos = 0
-                y_pos += 100
+                if cell == 1:
+                    wall = Tile(x_pos, y_pos, (0, 0, 255), is_wall=True)
+                    self.walls.add(wall)
+                    self.all_sprites.add(wall)
+                else:
+                    floor = Tile(x_pos, y_pos, "Yellow", is_wall=False)
+                    self.floors.add(floor)
+                    self.all_sprites.add(floor)
 
 
 
