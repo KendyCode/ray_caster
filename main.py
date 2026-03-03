@@ -1,28 +1,44 @@
+from random import shuffle
+
 import pygame
 import math
 import random
 
 map = [
-       [1, 1, 1, 1, 1, 1, 1, 1],
-       [1, 0, 0, 0, 1, 0, 0, 1],
-       [1, 0, 1, 0, 0, 1, 0, 1],
-       [1, 0, 0, 0, 0, 0, 0, 1],
-       [1, 1, 1, 1, 1, 1, 1, 1],
+       [1, 1, 1, 1, 1, 1, 1, 1,1,1],
+       [1, 0, 0, 0, 1, 0, 0,0,0,1 ],
+       [1, 0, 1, 0, 0, 1, 0,0,0,1 ],
+       [1, 0, 0, 0, 0, 0, 0, 0,0,1],
+
+    [1, 0, 0, 0, 1, 0, 0,0,0,1 ],
+    [1, 0, 1, 0, 0, 1, 0,0,0,1 ],
+    [1, 0, 0, 0, 0, 0, 0,0,0,1 ],
+
+    [1, 0, 0, 0, 1, 0, 0,0,0,1 ],
+    [1, 0, 1, 0, 0, 1, 0,0,0,1 ],
+    [1, 0, 0, 0, 0, 0, 0,0,0,1 ],
+    [1, 0, 0, 0, 1, 0, 0, 0,0,1],
+    [1, 0, 1, 0, 0, 1, 0, 0,0,1],
+    [1, 0, 0, 0, 0, 0, 0,0,0,1 ],
+    [1, 1, 1, 1, 1, 1, 1, 1,1,1],
        ]
 
+
+TILE_SIZE = 100
 MAP_HEIGHT = len(map)
 MAP_WIDTH = len(map[0])
+WIDTH_2D = MAP_WIDTH * TILE_SIZE
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self,x,y,color,is_wall=False):
         # Si on oublie de mettre super().__init__() on aura une erreur
         super().__init__()
 
-        self.image = pygame.Surface((100, 100))
+        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.image.fill(color)
 
         # Ajout du contour directement sur l'image du sprite
-        pygame.draw.rect(self.image, (0, 0, 0), [0, 0, 100, 100],1)
+        pygame.draw.rect(self.image, (0, 0, 0), [0, 0, TILE_SIZE, TILE_SIZE],1)
 
         # Le rectangle qui gère la position
         self.rect = self.image.get_rect(topleft=(x, y))
@@ -109,9 +125,9 @@ class Player(pygame.sprite.Sprite):
     def cast_rays(self, surface):
         # --- ETAPE A : LE DECOR ---
         # Un rectangle gris pour le ciel sur toute la zone 3D (de 800 à 1400)
-        pygame.draw.rect(surface, (50, 50, 50), [800, 0, 600, 400])
+        pygame.draw.rect(surface, (50, 50, 50), [WIDTH_2D, 0, 600, 400])
         # Un rectangle vert ou gris clair pour le sol
-        pygame.draw.rect(surface, (100, 100, 100), [800, 400, 600, 400])
+        pygame.draw.rect(surface, (100, 100, 100), [WIDTH_2D, 400, 600, 400])
 
         # On définit le début du cône (ex: l'angle actuel - 30 degrés)
         start_angle = self.angle - 30
@@ -136,8 +152,8 @@ class Player(pygame.sprite.Sprite):
                 ray_x += dx
                 ray_y += dy
                 # 1. On trouve la case correspondante
-                col = int(ray_x // 100)
-                row = int(ray_y // 100)
+                col = int(ray_x // TILE_SIZE)
+                row = int(ray_y // TILE_SIZE)
 
 
                 # 2. On vérifie qu'on est bien dans les limites de la map
@@ -153,11 +169,11 @@ class Player(pygame.sprite.Sprite):
 
                         # On calcule la hauteur du mur à afficher
                         # On évite la division par zéro avec max(1, depth)
-                        wall_height = 20000 / max(1, depth)
+                        wall_height = (TILE_SIZE * 200) / max(1, depth)
 
                         # On dessine une colonne verticale pour chaque rayon
                         # x_3d : on commence à 800 pixels et on avance de 10 pixels par rayon (60 rayons * 10 = 600px)
-                        x_3d = 800 + (i * 10)
+                        x_3d = WIDTH_2D + (i * 10)
 
 
                         # Shadow
@@ -206,8 +222,8 @@ class World:
         for row_index, row in enumerate(self.map_data):
             # On parcourt chaque colonne (x) dans cette ligne
             for col_index, cell in enumerate(row):
-                x_pos = col_index * 100
-                y_pos = row_index * 100
+                x_pos = col_index * TILE_SIZE
+                y_pos = row_index * TILE_SIZE
 
                 if cell == 1:
                     wall = Tile(x_pos, y_pos, (0, 0, 255), is_wall=True)
@@ -228,7 +244,7 @@ class World:
 
 
 pygame.init()
-screen = pygame.display.set_mode((1400,800))
+screen = pygame.display.set_mode((WIDTH_2D + 600, 800))
 pygame.display.set_caption("RayCaster")
 clock = pygame.time.Clock()
 
