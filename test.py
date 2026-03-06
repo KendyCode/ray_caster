@@ -22,19 +22,16 @@ print(MAP_WIDTH)
 WIDTH_2D = MAP_WIDTH * TILE_SIZE
 
 class Tile(pygame.sprite.Sprite):
-    def __init__(self,x,y,color,is_wall=False):
+    def __init__(self,x,y,color):
         # Si on oublie de mettre super().__init__() on aura une erreur
         super().__init__()
 
         self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.image.fill(color)
 
-        # Ajout du contour directement sur l'image du sprite
-        pygame.draw.rect(self.image, (0, 0, 0), [0, 0, TILE_SIZE, TILE_SIZE],1)
 
         # Le rectangle qui gère la position
         self.rect = self.image.get_rect(topleft=(x, y))
-        self.is_wall = is_wall # Pratique pour les futures collisions
 
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -47,7 +44,6 @@ class World:
         super().__init__()
         self.map_data = game_map
         self.walls = pygame.sprite.Group()
-        self.floors = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.generate_world()
 
@@ -60,13 +56,10 @@ class World:
                 y_pos = row_index * TILE_SIZE
 
                 if cell == 1:
-                    wall = Tile(x_pos, y_pos, (0, 0, 255), is_wall=True)
+                    wall = Tile(x_pos, y_pos, (0, 0, 255))
                     self.walls.add(wall)
                     self.all_sprites.add(wall)
-                else:
-                    floor = Tile(x_pos, y_pos, "Yellow", is_wall=False)
-                    self.floors.add(floor)
-                    self.all_sprites.add(floor)
+
 
 pygame.init()
 screen = pygame.display.set_mode((MAP_WIDTH*100,MAP_HEIGHT*100))
