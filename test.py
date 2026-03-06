@@ -33,11 +33,7 @@ class Tile(pygame.sprite.Sprite):
         # Le rectangle qui gère la position
         self.rect = self.image.get_rect(topleft=(x, y))
 
-        self.mask = pygame.mask.from_surface(self.image)
-
-
-
-
+        
 
 class World:
     def __init__(self, game_map):
